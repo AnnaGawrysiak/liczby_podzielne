@@ -17,7 +17,9 @@ using namespace std;
 
 int random_number();
 
-bool divisibility ( int number);
+bool pred(int a, int b);
+
+void remDup(vector <int> &v);
 
 int main()
 {
@@ -27,23 +29,19 @@ int main()
 
     generate(numbers.begin(), numbers.end(), random_number);
 
-    numbers.erase(remove_if(numbers.begin(), numbers.end(),divisibility),numbers.end());
+    remDup(numbers);
 
-    copy(numbers.begin(), numbers.end(), ostream_iterator<int>(std::cout, " "));
+    //numbers.erase(remove_if(numbers.begin(), numbers.end(),divisibility),numbers.end());
+
+    cout << "Vector after duplicates being erased: " << endl;
+
+    copy(numbers.begin(), numbers.end(), ostream_iterator<int>(cout, " "));
 
     return 0;
 }
 
 int random_number()
 {
-    //random_device rd; // used to initialize seed engine
-    //mt19937 rng(rd());
-   // uniform_int_distribution<int> uni(1,59);
-    //auto random_integer = uni(rng);
-    //int number = random_integer;
-
-    //cout << rd.entropy() << endl;
-
     int number = rand()%MAX_NUM;
 
     cout << number << endl;
@@ -51,10 +49,25 @@ int random_number()
     return number;
 }
 
-bool divisibility ( int number)
+bool pred (int a, int b)
 {
-    if(number%3==0||number%13==0)
+    if ((a == b && a%3!=0)||(a == b && a%13!=0)||(a == b && b%3!=0)||(a == b && b%13!=0))
         return true;
+     else
+        return false;
+}
 
-    return false;
+
+void remDup(vector <int> &v)
+{
+    // sorting vector
+    sort(v.begin(), v.end());
+
+    // using unique() method
+    // to remove duplicates
+   auto ip = unique(v.begin(), v.end(), pred);
+
+    // resize the new vector
+    v.resize(distance(v.begin(), ip));
+
 }
