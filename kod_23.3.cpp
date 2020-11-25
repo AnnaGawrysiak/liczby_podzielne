@@ -1,15 +1,10 @@
- /*
- Usuñ wszystkie duplikaty, poza tymi, które s¹ podzielne przez 3 lub 13.
- Posortuj vector w nastêpuj¹cej kolejnoœci - najpierw liczby podzielne przez 3, potem podzielne przez 13,
- potem ca³a reszta - nie zmieniaj kolejnoœci wylosowanych liczb.
- */
-
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include<time.h>
 #include<stdlib.h>
 #include <iterator> // for ostream_iterator
+#include <unordered_set>
 
 #define MAX_NUM 59
 
@@ -17,7 +12,7 @@ using namespace std;
 
 int random_number();
 
-bool pred(int a, int b);
+bool pred(int a);
 
 void remDup(vector <int> &v);
 
@@ -29,11 +24,78 @@ int main()
 
     generate(numbers.begin(), numbers.end(), random_number);
 
-    remDup(numbers);
+    cout << "Vector elements: " << endl;
 
-    //numbers.erase(remove_if(numbers.begin(), numbers.end(),divisibility),numbers.end());
+    cout << endl;
 
-    cout << "Vector after duplicates being erased: " << endl;
+    copy(numbers.begin(), numbers.end(), ostream_iterator<int>(cout, " "));
+
+    unordered_set<int> myset;
+
+    vector<int>::iterator it;
+
+    for(it = numbers.begin(); it != numbers.end(); it++)
+    {
+             myset.insert(numbers.at(*it));
+
+    }
+
+    // erase numbers divisible by 13 and 3 from myset
+
+    for (auto iter = myset.begin(); iter != myset.end(); iter++)
+    {
+        if (pred(*iter))
+        {
+            myset.erase(iter);
+        }
+
+    }
+
+    // isolate numbers divisible by 3 and 13 from initial vector
+
+     vector <int> myvector3;
+
+     vector <int> myvector13;
+
+     int i = 0;
+
+     int j = 0;
+
+    for_each(numbers.begin(), numbers.end(), [&i, &j, &myvector3](int number)
+        {
+            if(number%3==0)
+                myvector3.push_back(number);
+
+        });
+
+    for_each(numbers.begin(), numbers.end(), [&i, &j, &myvector13](int number)
+        {
+
+             if(number%13==0)
+                myvector13.push_back(number);
+
+        });
+
+    // sorting of vector contents
+
+        sort(myvector3.begin(), myvector3.end());
+
+        sort(myvector13.begin(), myvector13.end());
+
+    // clear vector contents, preallocate memory and insert new values
+
+    numbers.clear();
+
+    numbers.reserve(myvector3.size() + myvector13.size() + myset.size()); // preallocate memory
+    numbers.insert(numbers.end(), myvector3.begin(), myvector3.end());
+    numbers.insert(numbers.end(), myvector13.begin(), myvector13.end());
+
+    cout << "Vector contents: " << endl;
+
+   for (auto iter = myset.begin(); iter != myset.end(); iter++)
+    {
+           numbers.push_back(*iter);
+    }
 
     copy(numbers.begin(), numbers.end(), ostream_iterator<int>(cout, " "));
 
@@ -44,30 +106,13 @@ int random_number()
 {
     int number = rand()%MAX_NUM;
 
-    cout << number << endl;
-
     return number;
 }
 
-bool pred (int a, int b)
+bool pred (int a)
 {
-    if ((a == b && a%3!=0)||(a == b && a%13!=0)||(a == b && b%3!=0)||(a == b && b%13!=0))
+    if (a%3==0||a%13==0)
         return true;
      else
         return false;
-}
-
-
-void remDup(vector <int> &v)
-{
-    // sorting vector
-    sort(v.begin(), v.end());
-
-    // using unique() method
-    // to remove duplicates
-   auto ip = unique(v.begin(), v.end(), pred);
-
-    // resize the new vector
-    v.resize(distance(v.begin(), ip));
-
 }
