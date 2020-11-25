@@ -1,10 +1,20 @@
+/*
+3.
+Usuñ wszystkie duplikaty, poza tymi, które s¹ podzielne przez 3 lub 13. Posortuj vector w nastêpuj¹cej kolejnoœci
+ - najpierw liczby podzielne przez 3, potem podzielne przez 13, potem ca³a reszta - nie zmieniaj kolejnoœci wylosowanych liczb.
+
+3**. Je¿eli chcesz mocnego utrudnienia dla powy¿szego zadania, to jest takie :)
+Trzeba je wykonaæ bez tworzenia dodatkowego kontenera na dane, czyli np. bez dodatkowego vectora.
+*/
+
+// najpierw posortuj tak, zeby elemnety podzielne przez 3 znalaz³y sie na poczatku (uzwyj wlasnej funkcji do sortowania), ustaw pozycje pierwszego elementu niepodzielnego przez 3, nastepnie podzielne przez 13, potem ustaw wektor na pirwszej liczbie niepodzielnej przez 3 ani przez 13 i usun duplikaty pozostaych liczb
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include<time.h>
 #include<stdlib.h>
 #include <iterator> // for ostream_iterator
-#include <unordered_set>
 
 #define MAX_NUM 59
 
@@ -12,9 +22,9 @@ using namespace std;
 
 int random_number();
 
-bool pred(int a);
+bool pred3(int a, int b);
 
-void remDup(vector <int> &v);
+bool pred13 (int a, int b);
 
 int main()
 {
@@ -30,66 +40,76 @@ int main()
 
     copy(numbers.begin(), numbers.end(), ostream_iterator<int>(cout, " "));
 
-    unordered_set<int> myset;
+    // posortuj tak, aby podzielne przez 3 by³y na poczatku
 
-    vector<int>::iterator it;
+    sort(
+    numbers.begin(),
+    numbers.end(),
+    pred3);
 
-    for(it = numbers.begin(); it != numbers.end(); it++)
+    // ustal pozycje pierwszego elementu niepodzielnego przez 3
+
+    int position_of_first_element_nondivisible_by_3 = 0;
+
+     vector <int> :: iterator it = find_if(numbers.begin(), numbers.end(), [&numbers] (const int &number)
+                                       {
+                                           return number%3 != 0;
+                                       });
+
+    if (it != numbers.end())
     {
-             myset.insert(numbers.at(*it));
-
+        position_of_first_element_nondivisible_by_3 = (it - numbers.begin() + 1);
     }
 
-    // erase numbers divisible by 13 and 3 from myset
 
-    for (auto iter = myset.begin(); iter != myset.end(); iter++)
+    // przesuniecie liczb podzielnych przez 13 za liczby podzielne przez 3
+
+
+    sort(
+    numbers.begin() + position_of_first_element_nondivisible_by_3,
+    numbers.end(),
+    pred13);
+
+     // ustal pozycje pierwszego elementu niepodzielnego przez 3
+
+    vector <int> :: iterator it2 = find_if(numbers.begin(), numbers.end(), [&numbers] (const int &number)
+                                       {
+                                           return (number%3 != 0);
+                                       });
+
+    int position_of_first_element13 = 0;
+
+    if (it2 != numbers.end())
     {
-        if (pred(*iter))
-        {
-            myset.erase(iter);
-        }
-
+        position_of_first_element13 = (it2 - numbers.begin() + 1);
     }
 
-    // isolate numbers divisible by 3 and 13 from initial vector
+    // przesun liczby podzielne przez 13 za liczby podzielne przez 3, a przed pozostale
 
-     vector <int> myvector3;
+    sort(
+    numbers.begin() + position_of_first_element13,
+    numbers.end(),
+    pred13);
 
-     vector <int> myvector13;
+    // ustal pozycje pierwszego elementu niepodzielnego przez 3
 
-     int i = 0;
+    vector <int> :: iterator it3 = find_if(numbers.begin(), numbers.end(), [&numbers] (const int &number)
+                                       {
+                                           return (number%3 != 0 && number%13 != 0);
+                                       });
 
-     int j = 0;
+    int position_of_first_element = 0;
 
-    for_each(numbers.begin(), numbers.end(), [&i, &j, &myvector3](int number)
-        {
-            if(number%3==0)
-                myvector3.push_back(number);
+    if (it3 != numbers.end())
+    {
+        position_of_first_element = (it3 - numbers.begin() + 1);
+    }
 
-        });
+    // Usuñ wszystkie duplikaty z pozostalego zakresu.
 
-    for_each(numbers.begin(), numbers.end(), [&i, &j, &myvector13](int number)
-        {
-
-             if(number%13==0)
-                myvector13.push_back(number);
-
-        });
-
-    // clear vector contents, preallocate memory and insert new values
-
-    numbers.clear();
-
-    numbers.reserve(myvector3.size() + myvector13.size() + myset.size()); // preallocate memory
-    numbers.insert(numbers.end(), myvector3.begin(), myvector3.end());
-    numbers.insert(numbers.end(), myvector13.begin(), myvector13.end());
+    unique(numbers.begin() + position_of_first_element, numbers.end());
 
     cout << "Vector contents: " << endl;
-
-   for (auto iter = myset.begin(); iter != myset.end(); iter++)
-    {
-           numbers.push_back(*iter);
-    }
 
     copy(numbers.begin(), numbers.end(), ostream_iterator<int>(cout, " "));
 
@@ -103,10 +123,19 @@ int random_number()
     return number;
 }
 
-bool pred (int a)
+bool pred3 (int a, int b)
 {
-    if (a%3==0||a%13==0)
-        return true;
+    if (a%3==0&& b%3!=0)
+        return a < b;
      else
         return false;
 }
+
+bool pred13 (int a, int b)
+{
+    if (a%13==0&& b%13!=0)
+        return a < b;
+     else
+        return false;
+}
+
