@@ -1,14 +1,3 @@
-/*
-3.
-Usuñ wszystkie duplikaty, poza tymi, które s¹ podzielne przez 3 lub 13. Posortuj vector w nastêpuj¹cej kolejnoœci
- - najpierw liczby podzielne przez 3, potem podzielne przez 13, potem ca³a reszta - nie zmieniaj kolejnoœci wylosowanych liczb.
-
-3**. Je¿eli chcesz mocnego utrudnienia dla powy¿szego zadania, to jest takie :)
-Trzeba je wykonaæ bez tworzenia dodatkowego kontenera na dane, czyli np. bez dodatkowego vectora.
-*/
-
-// najpierw posortuj tak, zeby elemnety podzielne przez 3 znalaz³y sie na poczatku (uzwyj wlasnej funkcji do sortowania), ustaw pozycje pierwszego elementu niepodzielnego przez 3, nastepnie podzielne przez 13, potem ustaw wektor na pirwszej liczbie niepodzielnej przez 3 ani przez 13 i usun duplikaty pozostaych liczb
-
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -42,10 +31,9 @@ int main()
 
     // posortuj tak, aby podzielne przez 3 by³y na poczatku
 
-    sort(
-    numbers.begin(),
-    numbers.end(),
-    pred3);
+    sort(numbers.begin(),numbers.end(), pred3);
+
+    cout << endl;
 
     // ustal pozycje pierwszego elementu niepodzielnego przez 3
 
@@ -65,12 +53,9 @@ int main()
     // przesuniecie liczb podzielnych przez 13 za liczby podzielne przez 3
 
 
-    sort(
-    numbers.begin() + position_of_first_element_nondivisible_by_3,
-    numbers.end(),
-    pred13);
+    sort(numbers.begin() + position_of_first_element_nondivisible_by_3, numbers.end(), pred13);
 
-     // ustal pozycje pierwszego elementu niepodzielnego przez 3
+     // ustal pozycje pierwszego elementu niepodzielnego przez 13
 
     vector <int> :: iterator it2 = find_if(numbers.begin(), numbers.end(), [&numbers] (const int &number)
                                        {
@@ -91,7 +76,7 @@ int main()
     numbers.end(),
     pred13);
 
-    // ustal pozycje pierwszego elementu niepodzielnego przez 3
+    // ustal pozycje pierwszego elementu niepodzielnego przez 3 ani 13
 
     vector <int> :: iterator it3 = find_if(numbers.begin(), numbers.end(), [&numbers] (const int &number)
                                        {
@@ -123,18 +108,21 @@ int random_number()
     return number;
 }
 
+// Predykat ma zwracaæ wartoœæ false, je¿eli pierwszy argument powinien znajdowaæ siê za drugim,
+// natomiast true w przeciwnym wypadku.
+
 bool pred3 (int a, int b)
 {
     if (a%3==0&& b%3!=0)
-        return a < b;
+        return true;
      else
         return false;
 }
 
 bool pred13 (int a, int b)
 {
-    if (a%13==0&& b%13!=0)
-        return a < b;
+   if (a%13==0&& b%3!=0)
+        return true;
      else
         return false;
 }
