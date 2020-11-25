@@ -76,12 +76,6 @@ int main()
 
         });
 
-    // sorting of vector contents
-
-        sort(myvector3.begin(), myvector3.end());
-
-        sort(myvector13.begin(), myvector13.end());
-
     // clear vector contents, preallocate memory and insert new values
 
     numbers.clear();
